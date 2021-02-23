@@ -11,6 +11,8 @@ import BudgetList from "@/components/BudgetList";
 import TotalBalance from "@/components/TotalBalance";
 import Form from "@/components/Form";
 
+import {mapActions} from 'vuex';
+import {mapGetters} from 'vuex';
 export default {
   name: "app",
   components: {
@@ -19,20 +21,6 @@ export default {
     Form
   },
   data: () => ({
-    list: {
-      '1': {
-        type: "INCOME",
-        value: 100,
-        comment: "Some comment",
-        id: '1'
-      },
-      '2': {
-        type: "OUTCOME",
-        value: -50,
-        comment: "Some outcome comment",
-        id: '2'
-      }
-    }
   }),
   computed: {
     totalBalance() {
@@ -40,19 +28,25 @@ export default {
         (acc, item) => acc + item.value,
         0
       );
+    },
+    list() {
+      return this.storeGetList();
     }
   },
   methods: {
+    ...mapActions('budgetStore',['storeDeleteItem','storeAddItem']),
+    ...mapGetters('budgetStore',['storeGetList']),
     onDeleteItem(id) {
-      this.$delete(this.list, id);
+      //this.$delete(this.list, id);
+      this.storeDeleteItem(id);
     },
     onFormSubmit(data) {
       const newObj = {
         ...data,
         id: String(Math.random())
       };
-
-      this.$set(this.list, newObj.id, newObj);
+      this.storeAddItem(newObj);
+      //this.$set(this.list, newObj.id, newObj);
     }
   }
 };
